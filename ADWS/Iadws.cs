@@ -43,7 +43,7 @@ namespace ADWS
 
         [OperationContract]
         [WebInvoke( 
-            UriTemplate = "user/getattributes" , 
+            UriTemplate = "user/attributes" , 
             RequestFormat = WebMessageFormat.Json , 
             ResponseFormat = WebMessageFormat.Json ,
             BodyStyle = WebMessageBodyStyle.Bare, 
@@ -88,7 +88,7 @@ namespace ADWS
 
         [OperationContract]
         [WebInvoke(
-            UriTemplate = "ad/user/addtogroup" ,
+            UriTemplate = "ad/user/add/group" ,
             RequestFormat = WebMessageFormat.Json ,
             ResponseFormat = WebMessageFormat.Json ,
             BodyStyle = WebMessageBodyStyle.Bare ,
@@ -97,12 +97,21 @@ namespace ADWS
 
         [OperationContract]
         [WebInvoke(
-            UriTemplate = "ad/user/resetpassword" ,
+            UriTemplate = "ad/user/password/reset" ,
             RequestFormat = WebMessageFormat.Json ,
             ResponseFormat = WebMessageFormat.Json ,
             BodyStyle = WebMessageBodyStyle.Bare ,
             Method = "POST" )]
         ResponseMessage ResetADUserPassword( UserPasswordRequest userinfo );
+
+        [OperationContract]
+        [WebInvoke(
+            UriTemplate = "ad/user/lock" ,
+            RequestFormat = WebMessageFormat.Json ,
+            ResponseFormat = WebMessageFormat.Json ,
+            BodyStyle = WebMessageBodyStyle.Bare ,
+            Method = "POST" )]
+        ResponseMessage UnlockADAccount( UserLockRequest userinfo );
 
     }
 
