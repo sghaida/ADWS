@@ -66,8 +66,13 @@
     </Compile>
     <Compile Include="Cryptor.cs" />
     <Compile Include="Iadws.cs" />
+    <Compile Include="Models\ADMoveObjectRequest.cs" />
+    <Compile Include="Models\ADObjectTypecs.cs" />
+    <Compile Include="Models\ADRenameRequest.cs" />
+    <Compile Include="Models\ADGroupRequest.cs" />
     <Compile Include="Models\ADUserRequest.cs" />
     <Compile Include="Models\AuthDataRequest.cs" />
+    <Compile Include="Models\CreateGroupRequest.cs" />
     <Compile Include="Models\DomainRequest.cs" />
     <Compile Include="Models\DomainResponse.cs" />
     <Compile Include="Models\RequestBody.cs" />

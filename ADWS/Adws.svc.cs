@@ -503,7 +503,13 @@ namespace ADWS
 
             PrincipalContext principalContext = null;
 
-            string uri = userinfo.DomainInfo.ADHost + @"/" + userinfo.DomainInfo.ContainerPath;
+            string uri = FixADURI( userinfo.DomainInfo.ADHost , userinfo.DomainInfo.ContainerPath );
+
+            if ( string.IsNullOrWhiteSpace( uri ) )
+            {
+                status.Message = status.Message = "AD Host is not allowed to be empty, kindly provide the AD Host";
+                return status;
+            }
             
             bool isAllowWite = CheckWriteOermission( uri , userinfo.DomainInfo.BindingUserName , userinfo.DomainInfo.BindingUserPassword );
 
@@ -514,7 +520,11 @@ namespace ADWS
                 {
                     status.Message = " user already exists. Please use a different User Logon Name";
                     return status;
-                }   
+                }
+                else 
+                {
+                    principalContext = new PrincipalContext( ContextType.Domain , userinfo.DomainInfo.DomainName, userinfo.DomainInfo.ContainerPath , userinfo.DomainInfo.BindingUserName , userinfo.DomainInfo.BindingUserPassword );
+                }
             }
             catch ( Exception ex )
             {
@@ -533,6 +543,9 @@ namespace ADWS
 
             if ( !string.IsNullOrWhiteSpace( userinfo.LastName ) && !string.IsNullOrWhiteSpace( userinfo.FirstName ) )
                 userPrincipal.DisplayName = userinfo.FirstName + " " + userinfo.LastName;
+
+            if ( !string.IsNullOrWhiteSpace( userinfo.Description ) ) 
+                userPrincipal.Description = userinfo.Description;
 
             if ( !string.IsNullOrWhiteSpace( userinfo.EmployeeID ) )
                 userPrincipal.EmployeeId = userinfo.EmployeeID;
@@ -555,6 +568,12 @@ namespace ADWS
             try
             {
                 userPrincipal.Save();
+
+                DirectoryEntry de = (DirectoryEntry)userPrincipal.GetUnderlyingObject();
+
+                FillUserExtraAttributes( ref de , userinfo );
+                
+                de.CommitChanges();
                 status.Message = "Account has been created successfuly";
                 status.IsSuccessful = true;
             }
@@ -569,10 +588,182 @@ namespace ADWS
         }
 
         /// <summary>
+        /// Delete AD User Account
+        /// </summary>
+        /// <param name="userinfo">ADUserRequest object</param>
+        /// <returns>ResponseMessage</returns>
+        public ResponseMessage RemoveADUser( ADUserRequest userinfo ) 
+        {
+            ResponseMessage status = new ResponseMessage();
+
+            status.IsSuccessful = false;
+            status.Message = string.Empty;
+
+            Session stat = ValidateSession( userinfo.DomainInfo.SessionKey );
+
+            if ( stat.IsAuthenticated == true ) { }
+
+            PrincipalContext principalContext = null;
+
+            string uri = FixADURI( userinfo.DomainInfo.ADHost , userinfo.DomainInfo.ContainerPath );
+
+            if ( string.IsNullOrWhiteSpace( uri ) )
+            {
+                status.Message = status.Message = "AD Host is not allowed to be empty, kindly provide the AD Host";
+                return status;
+            }
+
+            bool isAllowWite = CheckWriteOermission( uri , userinfo.DomainInfo.BindingUserName , userinfo.DomainInfo.BindingUserPassword );
+
+            try
+            {
+                UserPrincipal usr = FindADUser( userinfo.SamAccountName , userinfo.DomainInfo );
+                if ( usr != null )
+                {
+                    usr.Delete();
+                   
+                    status.Message = " user Account has been Deleted";
+                    status.IsSuccessful = true;
+
+                    return status;
+                }
+                else 
+                {
+                    status.Message = " Can't delete user account. please check with administrator";
+
+                    return status;
+                }
+            }
+            catch ( Exception ex )
+            {
+                status.Message = @"Failed to create PrincipalContext: " + ex;
+                return status;
+            }
+        }
+
+        /// <summary>
+        /// Add AD Group
+        /// </summary>
+        /// <param name="groupInfo">CreateGroupRequest</param>
+        /// <returns>ResponseMessage</returns>
+        public ResponseMessage AddGroup( CreateGroupRequest groupInfo ) 
+        {
+            ResponseMessage status = new ResponseMessage();
+
+            status.IsSuccessful = false;
+            status.Message = string.Empty;
+
+            Session stat = ValidateSession( groupInfo.DomainInfo.SessionKey );
+
+            if ( stat.IsAuthenticated == true ) { }
+
+            PrincipalContext principalContext = null;
+
+            string uri = FixADURI( groupInfo.DomainInfo.ADHost , groupInfo.DomainInfo.ContainerPath );
+
+            if ( string.IsNullOrWhiteSpace( uri ) )
+            {
+                status.Message = status.Message = "AD Host is not allowed to be empty, kindly provide the AD Host";
+                return status;
+            }
+
+            bool isAllowWite = CheckWriteOermission( uri , groupInfo.DomainInfo.BindingUserName , groupInfo.DomainInfo.BindingUserPassword );
+
+            try
+            {
+                GroupPrincipal group = FindADGroup( groupInfo.GroupName , groupInfo.DomainInfo );
+
+                if ( group != null )
+                {   
+
+                    status.Message = @"There is a existing group with the provided name, kindly choose another name";
+                    
+                    return status;
+                }
+                else
+                {
+                    principalContext = new PrincipalContext( ContextType.Domain , groupInfo.DomainInfo.DomainName, groupInfo.DomainInfo.ContainerPath , groupInfo.DomainInfo.BindingUserName , groupInfo.DomainInfo.BindingUserPassword );
+                    
+                    group = new GroupPrincipal( principalContext , groupInfo.GroupName );
+                    group.DisplayName = groupInfo.DisplayName;
+                    group.Description = groupInfo.Description;
+                    group.GroupScope = groupInfo.OGroupScope;
+                    group.IsSecurityGroup = groupInfo.IsSecurityGroup;
+                    group.Save();
+
+                    status.Message = @"Group has been added successfully ";
+                    status.IsSuccessful = true;
+                    return status;
+                }
+            }
+            catch ( Exception ex )
+            {
+                status.Message = status.Message = "error has accured while adding the desgnated group" + ex;
+                return status;
+            }
+        }
+
+        /// <summary>
+        /// Remove Group
+        /// </summary>
+        /// <param name="groupInfo">ADGroupRequest</param>
+        /// <returns>ResponseMessage</returns>
+        public ResponseMessage RemoveGroup(ADGroupRequest groupInfo) 
+        {
+            ResponseMessage status = new ResponseMessage();
+
+            status.Message = string.Empty;
+            status.IsSuccessful = false;
+
+            Session stat = ValidateSession( groupInfo.DomainInfo.SessionKey );
+
+            if ( stat.IsAuthenticated == true ) { }
+
+            PrincipalContext principalContext = null;
+
+            string uri = FixADURI( groupInfo.DomainInfo.ADHost , groupInfo.DomainInfo.ContainerPath );
+
+            if ( string.IsNullOrWhiteSpace( uri ) )
+            {
+                status.Message = status.Message = "AD Host is not allowed to be empty, kindly provide the AD Host";
+                return status;
+            }
+
+            bool isAllowWite = CheckWriteOermission( uri , groupInfo.DomainInfo.BindingUserName , groupInfo.DomainInfo.BindingUserPassword );
+
+            try
+            {
+                GroupPrincipal group = FindADGroup( groupInfo.GroupName , groupInfo.DomainInfo );
+
+                if ( group != null )
+                {
+                    group.Delete();
+                    
+                    status.Message = @"The group has been removed successfully";
+                    status.IsSuccessful = true;
+
+                    return status;
+                }
+                else
+                {
+                    status.Message = @"The given Group doesn't exist ";
+                    return status;
+                }
+            }
+            catch ( Exception ex )
+            {
+                status.Message = status.Message = "error has accured while adding the desgnated group" + ex;
+                return status;
+            }
+
+            
+        }
+
+        /// <summary>
         /// Add user to a certain group
         /// </summary>
-        /// <param name="userinfo">UserGroup</param>
-        /// <returns>Status</returns>
+        /// <param name="userinfo">UserGroupRequest</param>
+        /// <returns>ResponseMessage</returns>
         public ResponseMessage AddADUserToGroup( UserGroupRequest userinfo )
         {
             ResponseMessage status = new ResponseMessage();
@@ -586,8 +777,14 @@ namespace ADWS
 
             PrincipalContext principalContext = null;
 
-            string uri = userinfo.DomainInfo.ADHost + @"/" + userinfo.DomainInfo.ContainerPath;
-            //eg @"GC://10.1.60.4/OU=ISD,OU=Departmental Resources,OU=MOA,OU=GR,DC=ccclab,DC=local" , @"CCCLAB\administrator" , "=25_ar;p" 
+            string uri = FixADURI( userinfo.DomainInfo.ADHost , userinfo.DomainInfo.ContainerPath );
+            
+            if ( string.IsNullOrWhiteSpace( uri ) ) 
+            {
+                status.Message = status.Message = "AD Host is not allowed to be empty, kindly provide the AD Host";
+                return status;
+            }
+
             bool isAllowWite = CheckWriteOermission( uri , userinfo.DomainInfo.BindingUserName , userinfo.DomainInfo.BindingUserPassword );
 
             try
@@ -620,6 +817,64 @@ namespace ADWS
         }
 
         /// <summary>
+        /// Remove user from a certain group
+        /// </summary>
+        /// <param name="userinfo">UserGroupRequest</param>
+        /// <returns>ResponseMessage</returns>
+        public ResponseMessage RemoveADUserFromGroup( UserGroupRequest userinfo ) 
+        {
+            ResponseMessage status = new ResponseMessage();
+
+            status.IsSuccessful = false;
+            status.Message = string.Empty;
+
+            Session stat = ValidateSession( userinfo.DomainInfo.SessionKey );
+
+            if ( stat.IsAuthenticated == true ) { }
+
+            PrincipalContext principalContext = null;
+
+            string uri = FixADURI( userinfo.DomainInfo.ADHost , userinfo.DomainInfo.ContainerPath );
+
+            if ( string.IsNullOrWhiteSpace( uri ) )
+            {
+                status.Message = status.Message = "AD Host is not allowed to be empty, kindly provide the AD Host";
+                return status;
+            }
+            
+            bool isAllowWite = CheckWriteOermission( uri , userinfo.DomainInfo.BindingUserName , userinfo.DomainInfo.BindingUserPassword );
+
+            try
+            {
+                GroupPrincipal group = FindADGroup( userinfo.GroupName , userinfo.DomainInfo );
+
+                if ( group != null )
+                {
+                    group.Members.Remove( principalContext , IdentityType.SamAccountName , userinfo.SamAccountName );
+
+                    group.Save();
+
+                    status.Message = "User has been removed successfuly from the designated Group";
+                    status.IsSuccessful = true;
+
+                    return status;
+                }
+                else
+                {
+                    status.Message = @"Group Doesn't Exist: ";
+                    return status;
+                }
+            }
+            catch ( Exception ex )
+            {
+                status.Message = status.Message = "error has accured while removing the user to the designated group" + ex;
+                return status;
+            }
+
+
+        }
+
+        /// <summary>
         /// Reset User Password
         /// </summary>
         /// <param name="userinfo">ADUserInfo</param>
@@ -635,7 +890,14 @@ namespace ADWS
 
             if ( stat.IsAuthenticated == true ) { }
 
-            string uri = userinfo.DomainInfo.ADHost + @"/" + userinfo.DomainInfo.ContainerPath;
+            string uri = FixADURI( userinfo.DomainInfo.ADHost , userinfo.DomainInfo.ContainerPath );
+
+            if ( string.IsNullOrWhiteSpace( uri ) )
+            {
+                status.Message = status.Message = "AD Host is not allowed to be empty, kindly provide the AD Host";
+                return status;
+            }
+
             bool isAllowWite = CheckWriteOermission( uri , userinfo.DomainInfo.BindingUserName , userinfo.DomainInfo.BindingUserPassword );
 
             try
@@ -695,7 +957,13 @@ namespace ADWS
 
             PrincipalContext principalContext = null;
 
-            string uri = userinfo.DomainInfo.ADHost + @"/" + userinfo.DomainInfo.ContainerPath;
+            string uri = FixADURI( userinfo.DomainInfo.ADHost , userinfo.DomainInfo.ContainerPath );
+
+            if ( string.IsNullOrWhiteSpace( uri ) )
+            {
+                status.Message = status.Message = "AD Host is not allowed to be empty, kindly provide the AD Host";
+                return status;
+            }
             
             bool isAllowWite = CheckWriteOermission( uri , userinfo.DomainInfo.BindingUserName , userinfo.DomainInfo.BindingUserPassword );
 
@@ -734,6 +1002,198 @@ namespace ADWS
         }
 
         /// <summary>
+        /// Rename Active Directory Object {User or Group}
+        /// </summary>
+        /// <param name="objectInfo"></param>
+        /// <returns></returns>
+        public ResponseMessage RenameObject(ADRenameRequest objectInfo) 
+        {
+            ResponseMessage status = new ResponseMessage();
+
+            status.IsSuccessful = false;
+            status.Message = string.Empty;
+
+            Session stat = ValidateSession( objectInfo.DomainInfo.SessionKey );
+
+            if ( stat.IsAuthenticated == true ) { }
+
+            PrincipalContext principalContext = null;
+
+            string uri = FixADURI( objectInfo.DomainInfo.ADHost , objectInfo.DomainInfo.ContainerPath );
+
+            if ( string.IsNullOrWhiteSpace( uri ) )
+            {
+                status.Message = status.Message = "AD Host is not allowed to be empty, kindly provide the AD Host";
+                return status;
+            }
+
+            bool isAllowWite = CheckWriteOermission( uri , objectInfo.DomainInfo.BindingUserName , objectInfo.DomainInfo.BindingUserPassword );
+
+            try
+            {
+                switch ( objectInfo.TypeOfObject )
+                {
+                    case ObjectType.USER:
+                        
+                        UserPrincipal usr = FindADUser( objectInfo.ObjectName , objectInfo.DomainInfo );
+                        
+                        if ( usr != null )
+                        {
+                            var userObj = (DirectoryEntry)usr.GetUnderlyingObject();
+                            userObj.Rename( "CN=" + objectInfo.NewObjectName );
+                            userObj.CommitChanges();
+
+                            status.Message = " User has been renamed successfuly";
+                            status.IsSuccessful = true;
+                            return status;
+                        }
+                        else 
+                        {
+                            status.Message = " No such user exists";
+                            return status;
+                        }
+                        
+                        break;
+                    
+                    case ObjectType.GROUP:
+                         GroupPrincipal group = FindADGroup( objectInfo.ObjectName , objectInfo.DomainInfo );
+
+                        if ( group != null )
+                        {
+                            var groupObj = (DirectoryEntry)group.GetUnderlyingObject();
+                            groupObj.Rename( "CN=" + objectInfo.NewObjectName );
+                            groupObj.CommitChanges();
+
+                            status.Message = " Group Has been renamed successfuly";
+                            status.IsSuccessful = true;
+                            return status;
+                        }
+                        else 
+                        {
+                            status.Message = " No such Group exists";
+                            return status;
+                        }
+                        
+                        break;
+                    default:
+                         status.Message = " Transaction type is not applicable";
+                         status.IsSuccessful = false;
+                         return status;
+                         
+                         break;
+                  
+                }
+            }
+            catch ( Exception ex ) 
+            {
+                status.Message = "An error occurred please check with system admin " + ex;
+                return status;
+            }
+        }
+
+        /// <summary>
+        /// Move AD Object from one place to another
+        /// </summary>
+        /// <param name="objectInfo">ADMoveObjectRequest</param>
+        /// <returns>ResponseMessage</returns>
+        public ResponseMessage MoveObject( ADMoveObjectRequest objectInfo ) 
+        {
+            ResponseMessage status = new ResponseMessage();
+
+            status.IsSuccessful = false;
+            status.Message = string.Empty;
+
+            Session stat = ValidateSession( objectInfo.DomainInfo.SessionKey );
+
+            if ( stat.IsAuthenticated == true ) { }
+
+            PrincipalContext principalContext = null;
+
+            string uriFrom = FixADURI( objectInfo.DomainInfo.ADHost , objectInfo.DomainInfo.ContainerPath );
+            string uriTo = FixADURI( objectInfo.DomainInfo.ADHost , objectInfo.NewParentObjectPath );
+
+            if ( string.IsNullOrWhiteSpace( uriFrom ) )
+            {
+                status.Message = status.Message = "AD Host is not allowed to be empty, kindly provide the AD Host";
+                return status;
+            }
+
+            bool isAllowWiteFrom = CheckWriteOermission( uriFrom , objectInfo.DomainInfo.BindingUserName , objectInfo.DomainInfo.BindingUserPassword );
+            bool isAllowWiteTo = CheckWriteOermission( uriTo , objectInfo.DomainInfo.BindingUserName , objectInfo.DomainInfo.BindingUserPassword );
+
+            try{
+
+                DirectoryEntry objTo = new DirectoryEntry( uriTo.Replace(@"GC://",@"LDAP://") , objectInfo.DomainInfo.BindingUserName , objectInfo.DomainInfo.BindingUserPassword );
+
+                switch ( objectInfo.TypeOfObject )
+                {
+                    case ObjectType.USER:
+
+                        UserPrincipal usrFrom = FindADUser( objectInfo.ObjectName , objectInfo.DomainInfo );
+                       
+                        if ( usrFrom != null )
+                        {
+                            var userObj = (DirectoryEntry)usrFrom.GetUnderlyingObject();
+
+                            userObj.MoveTo( objTo );
+                            userObj.CommitChanges();
+
+                            userObj.Close();
+                            objTo.Close();
+
+                            status.Message = " User has been Moved successfuly";
+                            status.IsSuccessful = true;
+                            return status;
+                        }
+                        else
+                        {
+                            status.Message = " No such user exists";
+                            return status;
+                        }
+
+                        break;
+
+                    case ObjectType.GROUP:
+
+                        GroupPrincipal groupFrom = FindADGroup( objectInfo.ObjectName , objectInfo.DomainInfo );
+
+                        if ( groupFrom != null )
+                        {   
+                            var groupObj = (DirectoryEntry)groupFrom.GetUnderlyingObject();
+                            groupObj.MoveTo( objTo );
+                            groupObj.CommitChanges();
+
+                            groupObj.Close();
+                            objTo.Close();
+
+                            status.Message = " Group Has been renamed successfuly";
+                            status.IsSuccessful = true;
+                            return status;
+                        }
+                        else
+                        {
+                            status.Message = " No such Group exists";
+                            return status;
+                        }
+
+                        break;
+                    
+                    default:
+                        status.Message = " Transaction type is not applicable";
+                        status.IsSuccessful = false;
+                        return status;
+
+                        break;
+                }
+            }
+            catch ( Exception ex ) 
+            {
+                status.Message = "An error occurred please check with system admin " + ex;
+                return status;
+            }
+        }
+
+        /// <summary>
         /// Validate if user exists in Active directory
         /// </summary>
         /// <param name="username">Identity to match</param>
@@ -744,13 +1204,13 @@ namespace ADWS
            
             Session stat = ValidateSession( domainInfo.SessionKey );
 
-            if ( stat.IsAuthenticated == true )
+            if ( stat.IsAuthenticated == false )
             {
                 PrincipalContext principalContext = null;
 
                 try
                 {
-                    principalContext = new PrincipalContext( ContextType.Domain , domainInfo.DomainName , domainInfo.BindingUserName , domainInfo.BindingUserPassword );
+                    principalContext = new PrincipalContext( ContextType.Domain , domainInfo.DomainName ,  domainInfo.BindingUserName , domainInfo.BindingUserPassword );
                 }
                 catch ( Exception ex )
                 {
@@ -778,11 +1238,11 @@ namespace ADWS
 
             PrincipalContext principalContext = null;
 
-            if ( stat.IsAuthenticated == true ) 
+            if ( stat.IsAuthenticated == false ) 
             {
                 try
                 {
-                    principalContext = new PrincipalContext( ContextType.Domain , domainInfo.DomainName , domainInfo.BindingUserName , domainInfo.BindingUserPassword );
+                    principalContext = new PrincipalContext( ContextType.Domain , domainInfo.DomainName,  domainInfo.BindingUserName , domainInfo.BindingUserPassword );
                 }
                  catch ( Exception ex )
                  {
@@ -828,8 +1288,72 @@ namespace ADWS
             int pwdProperties = (int)child.Properties[ "pwdProperties" ].Value;
 
             return Membership.GeneratePassword( minPwdLength , pwdProperties );
-
         }
+
+        private void FillUserExtraAttributes( ref DirectoryEntry de , UserCreateRequest userinfo ) 
+        {
+            try 
+            {
+                if ( !string.IsNullOrWhiteSpace( userinfo.Title ) )
+                    de.Properties[ "title" ].Value = userinfo.Title;
+
+                if ( !string.IsNullOrWhiteSpace( userinfo.City ) )
+                    de.Properties[ "l" ].Value = userinfo.City;
+
+                if ( !string.IsNullOrWhiteSpace( userinfo.Country ) )
+                    de.Properties[ "c" ].Value = userinfo.Country;
+
+                if ( !string.IsNullOrWhiteSpace( userinfo.PostalCode ) )
+                    de.Properties[ "postalCode" ].Value = userinfo.PostalCode;
+
+                if ( !string.IsNullOrWhiteSpace( userinfo.PostOfficeBox ) )
+                    de.Properties[ "postOfficeBox" ].Value = userinfo.PostOfficeBox;
+
+                if ( !string.IsNullOrWhiteSpace( userinfo.Address ) )
+                    de.Properties[ "streetAddress" ].Value = userinfo.Address;
+
+                if ( !string.IsNullOrWhiteSpace( userinfo.Department ) )
+                    de.Properties[ "department" ].Value = userinfo.Department;
+
+                if ( !string.IsNullOrWhiteSpace( userinfo.PhysicalDeliveryOffice ) )
+                    de.Properties[ "physicalDeliveryOfficeName" ].Value = userinfo.PhysicalDeliveryOffice;
+
+                if ( !string.IsNullOrWhiteSpace( userinfo.Company ) )
+                    de.Properties[ "company" ].Value = userinfo.Company;
+
+                if ( !string.IsNullOrWhiteSpace( userinfo.PhoneExtention ) )
+                    de.Properties[ "extensionAttribute1" ].Value = userinfo.PhoneExtention;
+
+                if ( !string.IsNullOrWhiteSpace( userinfo.PhoneIpAccessCode ) )
+                    de.Properties[ "extensionAttribute2" ].Value = userinfo.PhoneIpAccessCode;
+            }
+            catch ( Exception ex ) 
+            {
+                throw ex;
+            }
+        }
+
+        private string FixADURI( string adHost , string containerPath ) 
+        {
+            string uri = string.Empty;
+
+            if ( !string.IsNullOrWhiteSpace( adHost ) )
+            {
+                uri += adHost;
+            }
+            else
+            {
+                return null;
+            }
+
+            if ( !string.IsNullOrWhiteSpace( containerPath ) )
+            {
+                uri += @"/" + containerPath;
+            }
+
+            return uri;
+        }
+    
     }
 
 }
