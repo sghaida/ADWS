@@ -9,7 +9,6 @@ using ADWS.Models;
 
 namespace ADWS
 {
-    // NOTE: You can use the "Rename" command on the "Refactor" menu to change the interface name "IService1" in both code and config file together.
     [ServiceContract]
     public interface IAdws
     {
@@ -88,12 +87,66 @@ namespace ADWS
 
         [OperationContract]
         [WebInvoke(
+            UriTemplate = "ad/account/delete" ,
+            RequestFormat = WebMessageFormat.Json ,
+            ResponseFormat = WebMessageFormat.Json ,
+            BodyStyle = WebMessageBodyStyle.Bare ,
+            Method = "POST" )]
+        ResponseMessage RemoveADUser( [MessageParameter( Name = "userinfo" )] ADUserRequest userinfo );
+
+        [OperationContract]
+        [WebInvoke(
+            UriTemplate = "ad/group/add" ,
+            RequestFormat = WebMessageFormat.Json ,
+            ResponseFormat = WebMessageFormat.Json ,
+            BodyStyle = WebMessageBodyStyle.Bare ,
+            Method = "POST" )]
+        ResponseMessage AddGroup( [MessageParameter( Name = "groupinfo" )] CreateGroupRequest groupInfo );
+
+        [OperationContract]
+        [WebInvoke(
+            UriTemplate = "ad/group/remove" ,
+            RequestFormat = WebMessageFormat.Json ,
+            ResponseFormat = WebMessageFormat.Json ,
+            BodyStyle = WebMessageBodyStyle.Bare ,
+            Method = "POST" )]
+        ResponseMessage RemoveGroup( [MessageParameter( Name = "groupinfo" )] ADGroupRequest groupInfo );
+
+        [OperationContract]
+        [WebInvoke(
+            UriTemplate = "ad/object/rename" ,
+            RequestFormat = WebMessageFormat.Json ,
+            ResponseFormat = WebMessageFormat.Json ,
+            BodyStyle = WebMessageBodyStyle.Bare ,
+            Method = "POST" )]
+        ResponseMessage RenameObject( [MessageParameter( Name = "objectinfo" )] ADRenameRequest objectInfo);
+
+        [OperationContract]
+        [WebInvoke(
+            UriTemplate = "ad/object/move" ,
+            RequestFormat = WebMessageFormat.Json ,
+            ResponseFormat = WebMessageFormat.Json ,
+            BodyStyle = WebMessageBodyStyle.Bare ,
+            Method = "POST" )]
+        ResponseMessage MoveObject( [MessageParameter( Name = "objectinfo" )] ADMoveObjectRequest objectInfo );
+
+        [OperationContract]
+        [WebInvoke(
             UriTemplate = "ad/account/join/group" ,
             RequestFormat = WebMessageFormat.Json ,
             ResponseFormat = WebMessageFormat.Json ,
             BodyStyle = WebMessageBodyStyle.Bare ,
             Method = "POST" )]
         ResponseMessage AddADUserToGroup( [MessageParameter( Name = "userinfo" )] UserGroupRequest userInfo );
+
+        [OperationContract]
+        [WebInvoke(
+            UriTemplate = "ad/account/disjoin/group" ,
+            RequestFormat = WebMessageFormat.Json ,
+            ResponseFormat = WebMessageFormat.Json ,
+            BodyStyle = WebMessageBodyStyle.Bare ,
+            Method = "POST" )]
+        ResponseMessage RemoveADUserFromGroup( [MessageParameter( Name = "userinfo" )] UserGroupRequest userinfo ); 
 
         [OperationContract]
         [WebInvoke(

@@ -31,6 +31,13 @@ namespace ADWS.Models
         public string Address { get; set; }
 
         [DataMember]
+        public string PostalCode { get; set; }
+
+
+        [DataMember]
+        public string PostOfficeBox { get; set; }
+
+        [DataMember]
         public string PhysicalDeliveryOffice { get; set; }
 
         [DataMember]
@@ -47,6 +54,9 @@ namespace ADWS.Models
 
         [DataMember]
         public string Company { get; set; }
+
+        [DataMember]
+        public string Description { get; set; }
 
         [DataMember]
         public string PhoneExtention { get; set; }
