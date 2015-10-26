@@ -1,2 +1,4 @@
 ADWS/obj/
 ADWS/bin/
+ADWS/Properties/PublishProfiles/xxx.pubxml
+*.user
