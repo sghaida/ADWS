@@ -96,6 +96,7 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
+    <Compile Include="Models\ContactCreateRequest.cs" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
