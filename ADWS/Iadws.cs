@@ -79,7 +79,7 @@ namespace ADWS
 
         [OperationContract]
         [WebInvoke(
-            UriTemplate = "ad/user/add" ,
+            UriTemplate = "ad/account/add" ,
             RequestFormat = WebMessageFormat.Json ,
             ResponseFormat = WebMessageFormat.Json ,
             BodyStyle = WebMessageBodyStyle.Bare ,
@@ -88,7 +88,7 @@ namespace ADWS
 
         [OperationContract]
         [WebInvoke(
-            UriTemplate = "ad/user/add/group" ,
+            UriTemplate = "ad/account/join/group" ,
             RequestFormat = WebMessageFormat.Json ,
             ResponseFormat = WebMessageFormat.Json ,
             BodyStyle = WebMessageBodyStyle.Bare ,
@@ -97,7 +97,7 @@ namespace ADWS
 
         [OperationContract]
         [WebInvoke(
-            UriTemplate = "ad/user/password/reset" ,
+            UriTemplate = "ad/account/password/reset" ,
             RequestFormat = WebMessageFormat.Json ,
             ResponseFormat = WebMessageFormat.Json ,
             BodyStyle = WebMessageBodyStyle.Bare ,
@@ -106,7 +106,7 @@ namespace ADWS
 
         [OperationContract]
         [WebInvoke(
-            UriTemplate = "ad/user/lock" ,
+            UriTemplate = "ad/account/lock" ,
             RequestFormat = WebMessageFormat.Json ,
             ResponseFormat = WebMessageFormat.Json ,
             BodyStyle = WebMessageBodyStyle.Bare ,
