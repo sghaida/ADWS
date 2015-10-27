@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="ADWS.Models.ADGroupRequest">
+    <Position X="5.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>Models\ADGroupRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.ADMachineRequest">
+    <Position X="0.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\ADMachineRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.ADUserRequest">
+    <Position X="1.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\ADUserRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.AuthDataRequest">
+    <Position X="7" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAgAAAAA=</HashCode>
+      <FileName>Models\AuthDataRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.DomainRequest">
+    <Position X="9.25" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>IAAAAACAgAAAAAAQAAAAAAAIAAAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>Models\DomainRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.DomainResponse">
+    <Position X="11.5" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAQIAAAAAAQAAACAAAAEAAIAAAAgAAAAgAAAAAAAAE=</HashCode>
+      <FileName>Models\DomainResponse.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.RequestBody">
+    <Position X="5.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAQAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\RequestBody.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.RequestComputerCreate">
+    <Position X="2.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\RequestComputerCreate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.RequestContactCreate">
+    <Position X="14.5" Y="2.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAEAgAAAgAAAAAAIAAAAAAAAAAgAAAAg=</HashCode>
+      <FileName>Models\RequestContactCreate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.RequestGroupCreate">
+    <Position X="9.25" Y="2.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAECAAAAAgAAgAAAAAAAAAAAIAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>Models\RequestGroupCreate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.RequestMoveObject">
+    <Position X="16.75" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAAAAAAAIAAAgAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\RequestMoveObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.RequestObjectRename">
+    <Position X="5.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAABAAAAAAAAAAAAIAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\RequestObjectRename.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.RequestUserCreate">
+    <Position X="7" Y="2" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAIAAEEAAAAgAEIIIAAAAAAAEAIBAAACAIAEBgAAAgg=</HashCode>
+      <FileName>Models\RequestUserCreate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.ResponseMessage">
+    <Position X="9.25" Y="5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Models\ResponseMessage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.UserGroupRequest">
+    <Position X="16.75" Y="2.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>Models\UserGroupRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.UserInfoResponse">
+    <Position X="11.5" Y="3.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>hAIAEEAAAAAAAEAAQAAAAAAAEAACAAACAIAAIgBCAAo=</HashCode>
+      <FileName>Models\UserInfoResponse.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.UserLockRequest">
+    <Position X="14.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAABAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\UserLockRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ADWS.Models.UserPasswordRequest">
+    <Position X="14" Y="4.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>BAAAAEAAAAQAAAAAQBEAAAAAAEIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\UserPasswordRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="ADWS.Models.ObjectType">
+    <Position X="5.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAABAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\ADObjectTypecs.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
