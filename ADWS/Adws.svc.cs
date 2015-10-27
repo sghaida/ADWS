@@ -103,7 +103,7 @@ namespace ADWS
             }
             catch ( Exception ex )
             {
-                stat.Message = "Wrong Email and/or Password!";
+                stat.Message = "Wrong Email and/or Password " + ex;
                 stat.IsAuthenticated = false;
 
                 return stat;
@@ -163,7 +163,7 @@ namespace ADWS
                 }
                 catch ( Exception ex )
                 {
-                    stat.Message = "Couldn't validate Session key, kinldy authenticate first";
+                    stat.Message = "Couldn't validate Session key, kinldy authenticate first " + ex;
                     stat.IsAuthenticated = false;
 
                     return stat;
@@ -254,6 +254,7 @@ namespace ADWS
                 }
                 catch ( Exception ex )
                 {
+                    userInfo.Message = ex.Message;
                     return userInfo;
                 }
 
@@ -490,7 +491,7 @@ namespace ADWS
         /// </summary>
         /// <param name="userinfo">ADUser object</param>
         /// <returns></returns>
-        public ResponseMessage AddADUser( UserCreateRequest userinfo )
+        public ResponseMessage AddADUser( RequestUserCreate userinfo )
         {
             ResponseMessage status = new ResponseMessage();
 
@@ -603,8 +604,6 @@ namespace ADWS
 
             if ( stat.IsAuthenticated == true ) { }
 
-            PrincipalContext principalContext = null;
-
             string uri = FixADURI( userinfo.DomainInfo.ADHost , userinfo.DomainInfo.ContainerPath );
 
             if ( string.IsNullOrWhiteSpace( uri ) )
@@ -646,7 +645,7 @@ namespace ADWS
         /// </summary>
         /// <param name="groupInfo">CreateGroupRequest</param>
         /// <returns>ResponseMessage</returns>
-        public ResponseMessage AddGroup( CreateGroupRequest groupInfo ) 
+        public ResponseMessage AddGroup( RequestGroupCreate groupInfo ) 
         {
             ResponseMessage status = new ResponseMessage();
 
@@ -719,8 +718,6 @@ namespace ADWS
 
             if ( stat.IsAuthenticated == true ) { }
 
-            PrincipalContext principalContext = null;
-
             string uri = FixADURI( groupInfo.DomainInfo.ADHost , groupInfo.DomainInfo.ContainerPath );
 
             if ( string.IsNullOrWhiteSpace( uri ) )
@@ -757,6 +754,171 @@ namespace ADWS
             }
 
             
+        }
+
+        /// <summary>
+        /// ADD Active Directory Computer Obbject
+        /// </summary>
+        /// <param name="computerInfo">ADComputerRequest</param>
+        /// <returns>ResponseMessage</returns>
+        public ResponseMessage AddMachine( RequestComputerCreate computerInfo ) 
+        {
+            ResponseMessage status = new ResponseMessage();
+
+            status.IsSuccessful = false;
+            status.Message = string.Empty;
+
+            Session stat = ValidateSession( computerInfo.DomainInfo.SessionKey );
+
+            if ( stat.IsAuthenticated == true ) { }
+
+            string uri = FixADURI( computerInfo.DomainInfo.ADHost , computerInfo.DomainInfo.ContainerPath );
+
+            if ( string.IsNullOrWhiteSpace( uri ) )
+            {
+                status.Message = status.Message = "AD Host is not allowed to be empty, kindly provide the AD Host";
+                return status;
+            }
+
+            bool isAllowWite = CheckWriteOermission( uri , computerInfo.DomainInfo.BindingUserName , computerInfo.DomainInfo.BindingUserPassword );
+
+            try
+            {
+                ComputerPrincipal computer = FindADComputer( computerInfo.SamAccountName , computerInfo.DomainInfo );
+
+                if ( computer != null )
+                {
+
+                    status.Message = @"There is a existing computer with the provided name, kindly choose another name";
+
+                    return status;
+                }
+                else
+                {
+                   var principalContext = new PrincipalContext( ContextType.Domain , computerInfo.DomainInfo.DomainName , computerInfo.DomainInfo.ContainerPath , computerInfo.DomainInfo.BindingUserName , computerInfo.DomainInfo.BindingUserPassword );
+
+                    computer = new ComputerPrincipal( principalContext);
+                    computer.DisplayName = computerInfo.DisplayName;
+                    computer.Description = computerInfo.Description;
+                    computer.SamAccountName = computerInfo.SamAccountName;
+                    computer.Enabled = true;
+                    computer.SetPassword( GenerateADPassword( uri , computerInfo.DomainInfo.BindingUserName , computerInfo.DomainInfo.BindingUserPassword ) );
+                    computer.Save();
+
+                    status.Message = @"Computer has been added successfully ";
+                    status.IsSuccessful = true;
+                    return status;
+                }
+            }
+            catch ( Exception ex )
+            {
+                status.Message = status.Message = "error has accured while adding the desgnated group" + ex;
+                return status;
+            }
+        }
+
+        /// <summary>
+        /// Remove Machine Object from Active Directory
+        /// </summary>
+        /// <param name="computerInfo">ADMachineRequest</param>
+        /// <returns>ResponseMessage</returns>
+        public ResponseMessage RemoveMachine( ADMachineRequest computerInfo ) 
+        {
+            ResponseMessage status = new ResponseMessage();
+
+            status.IsSuccessful = false;
+            status.Message = string.Empty;
+
+            Session stat = ValidateSession( computerInfo.DomainInfo.SessionKey );
+
+            if ( stat.IsAuthenticated == true ) { }
+
+            string uri = FixADURI( computerInfo.DomainInfo.ADHost , computerInfo.DomainInfo.ContainerPath );
+
+            if ( string.IsNullOrWhiteSpace( uri ) )
+            {
+                status.Message = status.Message = "AD Host is not allowed to be empty, kindly provide the AD Host";
+                return status;
+            }
+
+            bool isAllowWite = CheckWriteOermission( uri , computerInfo.DomainInfo.BindingUserName , computerInfo.DomainInfo.BindingUserPassword );
+
+            try
+            {
+                ComputerPrincipal computer = FindADComputer( computerInfo.SamAccountName , computerInfo.DomainInfo );
+
+                if ( computer != null )
+                {
+                    computer.Delete();
+
+                    status.Message = @"There is a existing computer with the provided name, kindly choose another name";
+                    status.IsSuccessful = true;
+                    return status;
+                }
+                else
+                {
+                    status.Message = @"Computer Object doesn't exist with the correspondent name ";
+                    
+                    return status;
+                }
+            }
+            catch ( Exception ex )
+            {
+                status.Message = status.Message = "error has accured while adding the desgnated group" + ex;
+                return status;
+            }
+        }
+
+        /// <summary>
+        /// enable or Disable Machine Object in Active Directory
+        /// </summary>
+        /// <param name="computerInfo">ADMachineRequest</param>
+        /// <returns>ResponseMessage</returns>
+        public ResponseMessage EnableComputer( ADMachineRequest computerInfo ) 
+        {
+            ResponseMessage status = new ResponseMessage();
+
+            status.IsSuccessful = false;
+            status.Message = string.Empty;
+
+            Session stat = ValidateSession( computerInfo.DomainInfo.SessionKey );
+
+            if ( stat.IsAuthenticated == true ) { }
+
+            string uri = FixADURI( computerInfo.DomainInfo.ADHost , computerInfo.DomainInfo.ContainerPath );
+
+            if ( string.IsNullOrWhiteSpace( uri ) )
+            {
+                status.Message = status.Message = "AD Host is not allowed to be empty, kindly provide the AD Host";
+                return status;
+            }
+
+            bool isAllowWite = CheckWriteOermission( uri , computerInfo.DomainInfo.BindingUserName , computerInfo.DomainInfo.BindingUserPassword );
+
+            try
+            {
+                ComputerPrincipal computer = FindADComputer( computerInfo.SamAccountName , computerInfo.DomainInfo );
+
+                if ( computer != null )
+                {
+                    computer.Enabled = computerInfo.IsEnabled ;
+
+                    status.Message = @"Operation was done successfully";
+                    status.IsSuccessful = true;
+                    return status;
+                }
+                else
+                {
+                    status.Message = @"Computer Object doesn't exist with the correspondent name ";
+
+                    return status;
+                }
+            }
+            catch ( Exception ex )
+            {
+                status.Message = status.Message = "error has accured while adding the desgnated group" + ex;
+                return status;
+            }
         }
 
         /// <summary>
@@ -955,8 +1117,6 @@ namespace ADWS
 
             if ( stat.IsAuthenticated == true ) { }
 
-            PrincipalContext principalContext = null;
-
             string uri = FixADURI( userinfo.DomainInfo.ADHost , userinfo.DomainInfo.ContainerPath );
 
             if ( string.IsNullOrWhiteSpace( uri ) )
@@ -1006,7 +1166,7 @@ namespace ADWS
         /// </summary>
         /// <param name="objectInfo"></param>
         /// <returns></returns>
-        public ResponseMessage RenameObject(ADRenameRequest objectInfo) 
+        public ResponseMessage RenameObject(RequestObjectRename objectInfo) 
         {
             ResponseMessage status = new ResponseMessage();
 
@@ -1016,8 +1176,6 @@ namespace ADWS
             Session stat = ValidateSession( objectInfo.DomainInfo.SessionKey );
 
             if ( stat.IsAuthenticated == true ) { }
-
-            PrincipalContext principalContext = null;
 
             string uri = FixADURI( objectInfo.DomainInfo.ADHost , objectInfo.DomainInfo.ContainerPath );
 
@@ -1036,7 +1194,7 @@ namespace ADWS
                     case ObjectType.USER:
                         
                         UserPrincipal usr = FindADUser( objectInfo.ObjectName , objectInfo.DomainInfo );
-                        
+
                         if ( usr != null )
                         {
                             var userObj = (DirectoryEntry)usr.GetUnderlyingObject();
@@ -1045,12 +1203,10 @@ namespace ADWS
 
                             status.Message = " User has been renamed successfuly";
                             status.IsSuccessful = true;
-                            return status;
                         }
                         else 
                         {
                             status.Message = " No such user exists";
-                            return status;
                         }
                         
                         break;
@@ -1066,23 +1222,44 @@ namespace ADWS
 
                             status.Message = " Group Has been renamed successfuly";
                             status.IsSuccessful = true;
-                            return status;
+                            
                         }
                         else 
                         {
                             status.Message = " No such Group exists";
-                            return status;
+                            
                         }
                         
+                        break;
+
+                    case ObjectType.COMPUTER:
+                        ComputerPrincipal computer = FindADComputer( objectInfo.ObjectName , objectInfo.DomainInfo );
+
+                        if ( computer != null )
+                        {
+                            var computerObj = (DirectoryEntry)computer.GetUnderlyingObject();
+                            computerObj.Rename( "CN=" + objectInfo.NewObjectName );
+                            computerObj.CommitChanges();
+
+                            status.Message = " Group Has been renamed successfuly";
+                            status.IsSuccessful = true;
+                            
+                        }
+                        else
+                        {
+                            status.Message = " No such Group exists";
+                            
+                        }
+
                         break;
                     default:
                          status.Message = " Transaction type is not applicable";
                          status.IsSuccessful = false;
-                         return status;
                          
                          break;
                   
                 }
+                return status;
             }
             catch ( Exception ex ) 
             {
@@ -1096,7 +1273,7 @@ namespace ADWS
         /// </summary>
         /// <param name="objectInfo">ADMoveObjectRequest</param>
         /// <returns>ResponseMessage</returns>
-        public ResponseMessage MoveObject( ADMoveObjectRequest objectInfo ) 
+        public ResponseMessage MoveObject( RequestMoveObject objectInfo ) 
         {
             ResponseMessage status = new ResponseMessage();
 
@@ -1106,8 +1283,6 @@ namespace ADWS
             Session stat = ValidateSession( objectInfo.DomainInfo.SessionKey );
 
             if ( stat.IsAuthenticated == true ) { }
-
-            PrincipalContext principalContext = null;
 
             string uriFrom = FixADURI( objectInfo.DomainInfo.ADHost , objectInfo.DomainInfo.ContainerPath );
             string uriTo = FixADURI( objectInfo.DomainInfo.ADHost , objectInfo.NewParentObjectPath );
@@ -1143,12 +1318,10 @@ namespace ADWS
 
                             status.Message = " User has been Moved successfuly";
                             status.IsSuccessful = true;
-                            return status;
                         }
                         else
                         {
                             status.Message = " No such user exists";
-                            return status;
                         }
 
                         break;
@@ -1166,14 +1339,35 @@ namespace ADWS
                             groupObj.Close();
                             objTo.Close();
 
-                            status.Message = " Group Has been renamed successfuly";
+                            status.Message = " Group Has been Moved successfuly";
                             status.IsSuccessful = true;
-                            return status;
                         }
                         else
                         {
                             status.Message = " No such Group exists";
-                            return status;
+                        }
+
+                        break;
+
+                    case ObjectType.COMPUTER:
+
+                        ComputerPrincipal computerFrom = FindADComputer( objectInfo.ObjectName , objectInfo.DomainInfo );
+
+                        if ( computerFrom != null )
+                        {
+                            var computerObj = (DirectoryEntry)computerFrom.GetUnderlyingObject();
+                            computerObj.MoveTo( objTo );
+                            computerObj.CommitChanges();
+
+                            computerObj.Close();
+                            objTo.Close();
+
+                            status.Message = " Computer Has been Moved successfuly";
+                            status.IsSuccessful = true;
+                        }
+                        else
+                        {
+                            status.Message = " No such Group exists";
                         }
 
                         break;
@@ -1181,10 +1375,9 @@ namespace ADWS
                     default:
                         status.Message = " Transaction type is not applicable";
                         status.IsSuccessful = false;
-                        return status;
-
                         break;
                 }
+                return status;
             }
             catch ( Exception ex ) 
             {
@@ -1258,6 +1451,37 @@ namespace ADWS
         }
 
         /// <summary>
+        /// Find Computer Object
+        /// </summary>
+        /// <param name="computerName">computerName</param>
+        /// <param name="domainInfo">DomainRequest</param>
+        /// <returns></returns>
+        private ComputerPrincipal FindADComputer(string computerName, DomainRequest domainInfo)
+        {
+            Session stat = ValidateSession( domainInfo.SessionKey );
+
+            PrincipalContext principalContext = null;
+
+            if ( stat.IsAuthenticated == false ) 
+            {
+                try
+                {
+                    principalContext = new PrincipalContext( ContextType.Domain , domainInfo.DomainName,  domainInfo.BindingUserName , domainInfo.BindingUserPassword );
+                }
+                 catch ( Exception ex )
+                 {
+                     throw ex;
+                 }
+
+                return ComputerPrincipal.FindByIdentity( principalContext , computerName );
+            }
+            else 
+            {
+                throw new Exception( "Kindly authenticate first" );
+            }
+        }
+
+        /// <summary>
         /// Check if the user has a permission on a specific container based on his credintials 
         /// </summary>
         /// <param name="path">Conianter path</param>
@@ -1290,7 +1514,7 @@ namespace ADWS
             return Membership.GeneratePassword( minPwdLength , pwdProperties );
         }
 
-        private void FillUserExtraAttributes( ref DirectoryEntry de , UserCreateRequest userinfo ) 
+        private void FillUserExtraAttributes( ref DirectoryEntry de , RequestUserCreate userinfo ) 
         {
             try 
             {
