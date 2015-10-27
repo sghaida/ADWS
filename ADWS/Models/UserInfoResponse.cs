@@ -57,6 +57,9 @@ namespace ADWS.Models
         [DataMember]
         public string OtherTelphone { get; set; }
 
+        [DataMember]
+        public string Message { get; set; }
+
     }
 
 }
