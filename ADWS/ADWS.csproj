@@ -66,19 +66,21 @@
     </Compile>
     <Compile Include="Cryptor.cs" />
     <Compile Include="Iadws.cs" />
-    <Compile Include="Models\ADMoveObjectRequest.cs" />
+    <Compile Include="Models\ADMachineRequest.cs" />
+    <Compile Include="Models\RequestComputerCreate.cs" />
+    <Compile Include="Models\RequestMoveObject.cs" />
     <Compile Include="Models\ADObjectTypecs.cs" />
-    <Compile Include="Models\ADRenameRequest.cs" />
+    <Compile Include="Models\RequestObjectRename.cs" />
     <Compile Include="Models\ADGroupRequest.cs" />
     <Compile Include="Models\ADUserRequest.cs" />
     <Compile Include="Models\AuthDataRequest.cs" />
-    <Compile Include="Models\CreateGroupRequest.cs" />
+    <Compile Include="Models\RequestGroupCreate.cs" />
     <Compile Include="Models\DomainRequest.cs" />
     <Compile Include="Models\DomainResponse.cs" />
     <Compile Include="Models\RequestBody.cs" />
     <Compile Include="Models\ResponseMessage.cs" />
     <Compile Include="Models\Session.cs" />
-    <Compile Include="Models\UserCreateRequest.cs" />
+    <Compile Include="Models\RequestUserCreate.cs" />
     <Compile Include="Models\UserGroupRequest.cs" />
     <Compile Include="Models\UserInfoResponse.cs" />
     <Compile Include="Models\UserLockRequest.cs" />
@@ -96,7 +98,7 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Compile Include="Models\ContactCreateRequest.cs" />
+    <Compile Include="Models\RequestContactCreate.cs" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
