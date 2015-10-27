@@ -13,6 +13,8 @@ namespace ADWS.Models
         [EnumMember( Value = "USER" )]
         USER = 1 ,
         [EnumMember( Value = "GROUP" )]
-        GROUP = 2
+        GROUP = 2,
+        [EnumMember( Value = "COMPUTER" )]
+        COMPUTER = 3
     };
 }
