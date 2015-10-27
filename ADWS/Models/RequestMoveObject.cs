@@ -7,7 +7,7 @@ using System.Web;
 namespace ADWS.Models
 {
     [DataContract]
-    public class ADMoveObjectRequest
+    public class RequestMoveObject
     {
         [DataMember]
         public string ObjectName { get; set; }

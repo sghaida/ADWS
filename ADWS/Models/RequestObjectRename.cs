@@ -7,7 +7,7 @@ using System.Web;
 namespace ADWS.Models
 {
     [DataContract]
-    public class ADRenameRequest
+    public class RequestObjectRename
     {
         [DataMember]
         public string ObjectName { get; set; }

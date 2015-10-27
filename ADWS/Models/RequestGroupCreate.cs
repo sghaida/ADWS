@@ -8,7 +8,7 @@ using System.Web;
 namespace ADWS.Models
 {
     [DataContract]
-    public class CreateGroupRequest
+    public class RequestGroupCreate
     {
         [DataMember]
         public string GroupName { get; set; }

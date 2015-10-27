@@ -7,7 +7,7 @@ using System.Web;
 namespace ADWS.Models
 {
     [DataContract]
-    public class UserCreateRequest
+    public class RequestUserCreate
     {
         [DataMember]
         public string FirstName { get; set; }
