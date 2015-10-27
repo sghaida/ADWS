@@ -83,7 +83,7 @@ namespace ADWS
             ResponseFormat = WebMessageFormat.Json ,
             BodyStyle = WebMessageBodyStyle.Bare ,
             Method = "POST" )]
-        ResponseMessage AddADUser( [MessageParameter( Name = "userinfo" )] UserCreateRequest userinfo );
+        ResponseMessage AddADUser( [MessageParameter( Name = "userinfo" )] RequestUserCreate userinfo );
 
         [OperationContract]
         [WebInvoke(
@@ -101,7 +101,7 @@ namespace ADWS
             ResponseFormat = WebMessageFormat.Json ,
             BodyStyle = WebMessageBodyStyle.Bare ,
             Method = "POST" )]
-        ResponseMessage AddGroup( [MessageParameter( Name = "groupinfo" )] CreateGroupRequest groupInfo );
+        ResponseMessage AddGroup( [MessageParameter( Name = "groupinfo" )] RequestGroupCreate groupInfo );
 
         [OperationContract]
         [WebInvoke(
@@ -114,12 +114,39 @@ namespace ADWS
 
         [OperationContract]
         [WebInvoke(
+            UriTemplate = "ad/machine/add" ,
+            RequestFormat = WebMessageFormat.Json ,
+            ResponseFormat = WebMessageFormat.Json ,
+            BodyStyle = WebMessageBodyStyle.Bare ,
+            Method = "POST" )]
+        ResponseMessage AddMachine([MessageParameter( Name = "machineinfo" )] RequestComputerCreate computerInfo );
+
+        [OperationContract]
+        [WebInvoke(
+            UriTemplate = "ad/machine/remove" ,
+            RequestFormat = WebMessageFormat.Json ,
+            ResponseFormat = WebMessageFormat.Json ,
+            BodyStyle = WebMessageBodyStyle.Bare ,
+            Method = "POST" )]
+        ResponseMessage RemoveMachine( [MessageParameter( Name = "machineinfo" )] ADMachineRequest computerInfo );
+
+        [OperationContract]
+        [WebInvoke(
+            UriTemplate = "ad/machine/enable" ,
+            RequestFormat = WebMessageFormat.Json ,
+            ResponseFormat = WebMessageFormat.Json ,
+            BodyStyle = WebMessageBodyStyle.Bare ,
+            Method = "POST" )]
+        ResponseMessage EnableComputer( [MessageParameter( Name = "machineinfo" )] ADMachineRequest computerInfo );
+
+        [OperationContract]
+        [WebInvoke(
             UriTemplate = "ad/object/rename" ,
             RequestFormat = WebMessageFormat.Json ,
             ResponseFormat = WebMessageFormat.Json ,
             BodyStyle = WebMessageBodyStyle.Bare ,
             Method = "POST" )]
-        ResponseMessage RenameObject( [MessageParameter( Name = "objectinfo" )] ADRenameRequest objectInfo);
+        ResponseMessage RenameObject( [MessageParameter( Name = "objectinfo" )] RequestObjectRename objectInfo);
 
         [OperationContract]
         [WebInvoke(
@@ -128,7 +155,7 @@ namespace ADWS
             ResponseFormat = WebMessageFormat.Json ,
             BodyStyle = WebMessageBodyStyle.Bare ,
             Method = "POST" )]
-        ResponseMessage MoveObject( [MessageParameter( Name = "objectinfo" )] ADMoveObjectRequest objectInfo );
+        ResponseMessage MoveObject( [MessageParameter( Name = "objectinfo" )] RequestMoveObject objectInfo );
 
         [OperationContract]
         [WebInvoke(
