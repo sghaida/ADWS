@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 ﻿using System;
-=======
-using System;
 >>>>>>> 1f7ed621163aec8807a6f7352dc4569d1ce68bd3
 using System.Collections.Generic;
 using System.Linq;
@@ -21,8 +18,6 @@ namespace ADWS.Models
         [EnumMember( Value = "COMPUTER" )]
         COMPUTER = 3
     };
-<<<<<<< HEAD
+
 }
-=======
-}
->>>>>>> 1f7ed621163aec8807a6f7352dc4569d1ce68bd3
+
